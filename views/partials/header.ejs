@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title><%= title %> | <%= BRANDING.panelTitle %></title>
+  <link rel="stylesheet" href="/assets/bootstrap.min.css?v=2" />
+  <link rel="stylesheet" href="/assets/panel.css?v=2" />
+</head>
+<body class="panel-body panel-body--dashboard">
+  <div class="panel-backdrop"></div>
+  <div class="panel-shell">
+    <aside class="panel-sidebar">
+      <a class="panel-sidebar-brand" href="/">
+        <span class="panel-brand-mark"><%= BRANDING.shortName?.slice(0, 2) || "BT" %></span>
+        <span>
+          <strong><%= BRANDING.shortName %></strong>
+          <small>Discord Support Console</small>
+        </span>
+      </a>
+
+      <% if (currentUser) { %>
+        <div class="panel-user-card">
+          <img class="panel-user-avatar" src="<%= currentUser.avatarUrl %>" alt="<%= currentUser.username %>" />
+          <div>
+            <strong><%= currentUser.username %></strong>
+            <p><%= currentUser.isAdmin ? "Panel yoneticisi" : "Yetkili oturum" %></p>
+          </div>
+        </div>
+      <% } else { %>
+        <div class="panel-user-card panel-user-card--ghost">
+          <div>
+            <strong>Panel erisimi</strong>
+            <p>Discord OAuth2 oturumu</p>
+          </div>
+        </div>
+      <% } %>
+
+      <section class="panel-sidebar-section panel-sidebar-section--nav">
+        <div class="panel-sidebar-section-title">Navigasyon</div>
+        <nav class="panel-nav">
+          <a class="panel-nav-link <%= currentPath === '/' ? 'is-active' : '' %>" href="/">Kontrol Merkezi</a>
+          <% if (guilds && guilds.length > 0) { %>
+            <a class="panel-nav-link <%= currentPath.startsWith('/guilds') ? 'is-active' : '' %>" href="/guilds/<%= guilds[0].id %>">Sunucu Ayarlari</a>
+          <% } %>
+          <a class="panel-nav-link <%= currentPath.startsWith('/logs') ? 'is-active' : '' %>" href="/logs">Log Arsivi</a>
+        </nav>
+      </section>
+
+      <% if (guilds && guilds.length > 0) { %>
+        <section class="panel-sidebar-section">
+          <div class="panel-sidebar-section-title">Sunucu</div>
+          <div class="panel-guild-list">
+            <% guilds.slice(0, 6).forEach((guild) => { %>
+              <a class="panel-guild-link <%= selectedGuildId === guild.id ? 'is-active' : '' %>" href="/guilds/<%= guild.id %>">
+                <span class="panel-guild-icon">
+                  <% if (guild.iconUrl) { %>
+                    <img src="<%= guild.iconUrl %>" alt="<%= guild.name %>" />
+                  <% } else { %>
+                    <span><%= guild.name.slice(0, 1).toUpperCase() %></span>
+                  <% } %>
+                </span>
+                <span><%= guild.name %></span>
+              </a>
+            <% }) %>
+          </div>
+        </section>
+      <% } %>
+    </aside>
+
+    <div class="panel-content">
+      <header class="panel-topbar">
+        <div>
+          <p class="panel-eyebrow">DISCORD SUPPORT OPERATIONS</p>
+          <h1><%= title %></h1>
+        </div>
+        <div class="panel-topbar-actions">
+          <% if (currentUser) { %>
+            <span class="panel-user-chip">
+              <img class="panel-user-chip-avatar" src="<%= currentUser.avatarUrl %>" alt="<%= currentUser.username %>" />
+              <span><%= currentUser.username %><%= currentUser.isDeveloper ? ' · developer' : '' %></span>
+            </span>
+            <a class="panel-secondary-link" href="/logout">Cikis</a>
+          <% } else { %>
+            <span class="panel-user-chip panel-user-chip--ghost">Discord OAuth2</span>
+          <% } %>
+        </div>
+      </header>
+
+      <main class="panel-main">

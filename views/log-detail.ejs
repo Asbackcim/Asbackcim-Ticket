@@ -1,0 +1,96 @@
+<%- include('partials/header', { title: log.channelName || 'Log Detayi' }) %>
+
+<section class="panel-hero-card panel-hero-card--compact">
+  <div>
+    <p class="panel-eyebrow">LOG DETAYI</p>
+    <h2><%= log.channelName || "Ticket logu" %></h2>
+    <p class="panel-subcopy">
+      Ticketin kapanis nedeni, islem gecmisi ve transcript kaydi bu sayfada bir arada tutulur.
+    </p>
+  </div>
+  <div class="panel-hero-actions">
+    <a class="panel-secondary-link" href="/logs">Tum loglara don</a>
+  </div>
+</section>
+
+<section class="panel-grid panel-grid--detail">
+  <article class="panel-card">
+    <div class="panel-card-head">
+      <div>
+        <p class="panel-eyebrow">KAYIT OZETI</p>
+        <h3>Ticket bilgileri</h3>
+      </div>
+    </div>
+
+    <div class="detail-list">
+      <div class="detail-row">
+        <span>Islem</span>
+        <span class="status-pill <%= log.action === 'closed' ? 'tone-danger' : 'tone-success' %>">
+          <%= log.action === 'closed' ? 'Kapandi' : 'Arsivlendi' %>
+        </span>
+      </div>
+      <div class="detail-row">
+        <span>Acan</span>
+        <strong><%= log.openedByTag || log.openedById || "-" %></strong>
+      </div>
+      <div class="detail-row">
+        <span>Islemi yapan</span>
+        <strong><%= log.archivedByTag || log.archivedById || "-" %></strong>
+      </div>
+      <div class="detail-row">
+        <span>Ticket tipi</span>
+        <strong><%= log.ticketTypeLabel || "-" %></strong>
+      </div>
+      <div class="detail-row">
+        <span>Mesaj sayisi</span>
+        <strong><%= log.messageCount || 0 %></strong>
+      </div>
+      <div class="detail-row">
+        <span>Tarih</span>
+        <strong><%= formatDate(log.archivedAt) %></strong>
+      </div>
+    </div>
+
+    <div class="panel-card section-gap">
+      <div class="panel-card-head">
+        <div>
+          <p class="panel-eyebrow">SEBEP</p>
+          <h3>Kapatma notu</h3>
+        </div>
+      </div>
+      <div class="panel-rich-copy"><%= log.reason || "Neden belirtilmemis" %></div>
+    </div>
+  </article>
+
+  <article class="panel-card">
+    <div class="panel-card-head">
+      <div>
+        <p class="panel-eyebrow">TRANSCRIPT</p>
+        <h3>Mesaj akis kaydi</h3>
+      </div>
+    </div>
+
+    <% const localTranscriptUrl = log.transcriptPath ? `/transcripts/${encodeURIComponent(log.transcriptFileName)}` : null; %>
+    <% const externalTranscriptUrl = !localTranscriptUrl ? log.transcriptUrl : null; %>
+
+    <% if (localTranscriptUrl) { %>
+      <div class="transcript-toolbar">
+        <div class="transcript-toolbar-tags">
+          <span class="status-pill tone-muted"><%= log.messageCount || 0 %> mesaj</span>
+          <span class="status-pill tone-info"><%= log.ticketTypeLabel || "Tip belirtilmedi" %></span>
+        </div>
+        <a class="panel-secondary-link" href="<%= localTranscriptUrl %>" target="_blank" rel="noreferrer">Yeni sekmede ac</a>
+      </div>
+      <iframe class="transcript-frame" src="<%= localTranscriptUrl %>" title="Transcript"></iframe>
+    <% } else if (externalTranscriptUrl) { %>
+      <div class="panel-notice panel-notice--warning">
+        Bu transcript sadece Discord uzerinden ulasilabiliyor. Dis baglanti bazi tarayicilarda indirme davranisi gosterebilir.
+      </div>
+      <a class="btn btn-outline-secondary" href="<%= externalTranscriptUrl %>" target="_blank" rel="noreferrer">Discord transcriptini ac</a>
+    <% } else { %>
+      <div class="panel-empty-state">Bu kayit icin transcript bulunamadi.</div>
+    <% } %>
+  </article>
+</section>
+
+<%- include('partials/footer') %>

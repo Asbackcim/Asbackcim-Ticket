@@ -1,0 +1,26 @@
+{
+  "token": "<YOUR_BOT_TOKEN>",
+  "DeveloperID": "<YOUR_DISCORD_USER_ID>",
+  "DestekSunucuLink": "https://discord.gg/your-community",
+  "panel": {
+    "enabled": true,
+    "host": "127.0.0.1",
+    "port": 3001,
+    "publicUrl": "http://127.0.0.1:3001",
+    "primaryGuildId": "<TARGET_GUILD_ID>",
+    "username": "",
+    "password": "",
+    "sessionSecret": "<LONG_RANDOM_SESSION_SECRET>",
+    "discordAuth": {
+      "enabled": true,
+      "clientId": "",
+      "clientSecret": "<DISCORD_OAUTH_CLIENT_SECRET>",
+      "callbackPath": "/auth/discord/callback",
+      "adminUserIds": [
+        "<YOUR_DISCORD_USER_ID>"
+      ],
+      "allowedUserIds": []
+    },
+    "autoSyncHistoricalLogs": true
+  }
+}

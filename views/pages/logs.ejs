@@ -1,0 +1,106 @@
+<%- include('../partials/header', { title: 'Log Arsivi' }) %>
+
+<% if (message) { %>
+  <div class="panel-notice"><%= message %></div>
+<% } %>
+
+<section class="panel-card">
+  <div class="panel-card-head">
+    <div>
+      <p class="panel-eyebrow">FILTRELER</p>
+      <h3>Log aramasi</h3>
+    </div>
+    <% if (filters.guildId || filters.action || filters.q) { %>
+      <a class="panel-secondary-link" href="/logs">Filtreleri temizle</a>
+    <% } %>
+  </div>
+
+  <form class="panel-form-grid panel-form-grid--filters" method="get" action="/logs">
+    <% if (guilds.length > 1) { %>
+      <label class="panel-field">
+        <span>Sunucu</span>
+        <select class="form-select" name="guildId">
+          <option value="">Tum sunucular</option>
+          <% guilds.forEach((guild) => { %>
+            <option value="<%= guild.id %>" <%= filters.guildId === guild.id ? 'selected' : '' %>><%= guild.name %></option>
+          <% }) %>
+        </select>
+      </label>
+    <% } %>
+
+    <label class="panel-field">
+      <span>Islem</span>
+      <select class="form-select" name="action">
+        <option value="">Hepsi</option>
+        <option value="closed" <%= filters.action === 'closed' ? 'selected' : '' %>>Kapandi</option>
+        <option value="saved" <%= filters.action === 'saved' ? 'selected' : '' %>>Arsivlendi</option>
+      </select>
+    </label>
+
+    <label class="panel-field">
+      <span>Arama</span>
+      <input class="form-control" type="text" name="q" value="<%= filters.q || '' %>" placeholder="Kanal, kullanici veya sebep" />
+    </label>
+
+    <div class="panel-form-actions panel-form-actions--inline">
+      <button class="btn btn-primary" type="submit">Filtrele</button>
+    </div>
+  </form>
+</section>
+
+<section class="panel-card">
+  <div class="panel-card-head">
+    <div>
+      <p class="panel-eyebrow">SONUCLAR</p>
+      <h3><%= logs.length %> log kaydi</h3>
+    </div>
+    <div class="panel-status-pills">
+      <span class="status-pill tone-danger"><%= logSummary.closedCount %> kapandi</span>
+      <span class="status-pill tone-success"><%= logSummary.savedCount %> arsivlendi</span>
+    </div>
+  </div>
+
+  <% if (logs.length > 0) { %>
+    <div class="panel-table-wrap">
+      <table class="panel-data-table">
+        <thead>
+          <tr>
+            <th><%= guilds.length > 1 ? "Sunucu" : "Ticket" %></th>
+            <th><%= guilds.length > 1 ? "Kanal" : "Acan" %></th>
+            <th>Islem</th>
+            <th>Tip</th>
+            <th>Tarih</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% logs.forEach((log) => { %>
+            <tr>
+              <td><%= guilds.length > 1 ? (log.guildName || "-") : (log.channelName || "-") %></td>
+              <td><%= guilds.length > 1 ? (log.channelName || "-") : (log.openedByTag || log.openedById || "-") %></td>
+              <td>
+                <span class="status-pill <%= log.action === 'closed' ? 'tone-danger' : 'tone-success' %>">
+                  <%= log.action === 'closed' ? 'Kapandi' : 'Arsivlendi' %>
+                </span>
+              </td>
+              <td><%= log.ticketTypeLabel || "-" %></td>
+              <td><%= formatDate(log.archivedAt) %></td>
+              <td><a class="panel-secondary-link" href="/logs/<%= log.id %>">Detay</a></td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  <% } else { %>
+    <div class="panel-empty-state">
+      <p>Filtreye uygun log bulunmadi.</p>
+      <% if (canUseAdminActions) { %>
+        <form class="panel-action-form section-gap" method="post" action="/actions/sync-history">
+          <button class="panel-secondary-link" type="submit">Discord loglarini yeniden esitle</button>
+        </form>
+      <% } %>
+    </div>
+  <% } %>
+</section>
+
+<%- include('../partials/footer') %>

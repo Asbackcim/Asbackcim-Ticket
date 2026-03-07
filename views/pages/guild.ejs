@@ -1,0 +1,152 @@
+<%- include('../partials/header', { title: `${guild.name} Ayarlari` }) %>
+
+<% if (message) { %>
+  <div class="panel-notice"><%= message %></div>
+<% } %>
+
+<section class="panel-hero-card panel-hero-card--compact">
+  <div>
+    <p class="panel-eyebrow">SUNUCU YONETIMI</p>
+    <h2><%= guild.name %> ticket ayarlari</h2>
+    <p class="panel-subcopy">
+      Ticket kategorisini, log kanalini, yetkili rolunu ve kullaniciya sunulacak ticket tiplerini bu ekrandan belirleyebilirsin.
+    </p>
+  </div>
+  <div class="panel-hero-actions">
+    <span class="status-pill tone-info"><%= openTickets.length %> acik kayit</span>
+  </div>
+</section>
+
+<form method="post" action="/guilds/<%= guild.id %>/settings" class="panel-grid panel-grid--two">
+  <article class="panel-card panel-card--form">
+    <div class="panel-card-head">
+      <div>
+        <p class="panel-eyebrow">TEMEL AYARLAR</p>
+        <h3>Bot konfigurasyonu</h3>
+      </div>
+    </div>
+
+    <div class="panel-status-list section-gap">
+      <% setupStatus.forEach((item) => { %>
+        <div class="panel-status-row">
+          <div>
+            <strong><%= item.label %></strong>
+            <p><%= item.ready ? 'Bu alan kullanima hazir.' : 'Bu alan eksik, tamamlanmasi onerilir.' %></p>
+          </div>
+          <span class="status-pill <%= item.ready ? 'tone-success' : 'tone-warning' %>"><%= item.value %></span>
+        </div>
+      <% }) %>
+    </div>
+
+    <div class="panel-form-grid">
+      <label class="panel-field">
+        <span>Log kanali</span>
+        <select class="form-select" name="logChannelId">
+          <option value="">Seciniz</option>
+          <% channels.forEach((channel) => { %>
+            <option value="<%= channel.id %>" <%= settings.logChannelId === channel.id ? 'selected' : '' %>><%= channel.name %></option>
+          <% }) %>
+        </select>
+      </label>
+
+      <label class="panel-field">
+        <span>Yetkili rol</span>
+        <select class="form-select" name="staffRoleId">
+          <option value="">Seciniz</option>
+          <% roles.forEach((role) => { %>
+            <option value="<%= role.id %>" <%= settings.staffRoleId === role.id ? 'selected' : '' %>><%= role.name %></option>
+          <% }) %>
+        </select>
+      </label>
+
+      <label class="panel-field">
+        <span>Ticket kategorisi</span>
+        <select class="form-select" name="categoryId">
+          <option value="">Seciniz</option>
+          <% categories.forEach((category) => { %>
+            <option value="<%= category.id %>" <%= settings.categoryId === category.id ? 'selected' : '' %>><%= category.name %></option>
+          <% }) %>
+        </select>
+      </label>
+
+      <label class="panel-field">
+        <span>Kullanici basi limit</span>
+        <input class="form-control" type="number" name="limit" min="1" max="10" value="<%= settings.limit || 1 %>" />
+      </label>
+    </div>
+  </article>
+
+  <article class="panel-card">
+    <div class="panel-card-head">
+      <div>
+        <p class="panel-eyebrow">CANLI GORUNUM</p>
+        <h3>Acik Ticketlar</h3>
+      </div>
+      <span class="status-pill tone-info"><%= openTickets.length %> kayit</span>
+    </div>
+
+    <% if (openTickets.length > 0) { %>
+      <div class="panel-feed">
+        <% openTickets.forEach((ticket) => { %>
+          <div class="panel-feed-item">
+            <div>
+              <strong><%= ticket.channelName || "-" %></strong>
+              <p><%= ticket.openedByTag || ticket.openedById || "-" %> · <%= formatDate(ticket.createdAt) %></p>
+            </div>
+            <span class="status-pill tone-info"><%= ticket.ticketType?.label || "-" %></span>
+          </div>
+        <% }) %>
+      </div>
+    <% } else { %>
+      <div class="panel-empty-state">
+        <p>Bu sunucuda acik ticket yok.</p>
+        <a class="panel-secondary-link section-gap" href="/logs?guildId=<%= guild.id %>">Bu sunucunun loglarini ac</a>
+      </div>
+    <% } %>
+  </article>
+
+  <article class="panel-card panel-card--span-two">
+    <div class="panel-card-head">
+      <div>
+        <p class="panel-eyebrow">TICKET TIPLERI</p>
+        <h3>Kullanicinin gorecegi secenekler</h3>
+      </div>
+      <span class="status-pill tone-info"><%= ticketTypeSlots.filter((type) => type.label).length %> aktif tip</span>
+    </div>
+
+    <div class="ticket-type-editor">
+      <% ticketTypeSlots.forEach((type, index) => { %>
+        <div class="ticket-type-row">
+          <div class="ticket-type-index">#<%= index + 1 %></div>
+          <div class="panel-form-grid panel-form-grid--ticket">
+            <label class="panel-field">
+              <span>Kisa deger</span>
+              <input class="form-control" type="text" name="ticketTypeValue" maxlength="24" value="<%= type.value %>" placeholder="sunucu-ici" />
+            </label>
+
+            <label class="panel-field">
+              <span>Baslik</span>
+              <input class="form-control" type="text" name="ticketTypeLabel" maxlength="32" value="<%= type.label %>" placeholder="Sunucu ici" />
+            </label>
+
+            <label class="panel-field">
+              <span>Aciklama</span>
+              <input class="form-control" type="text" name="ticketTypeDescription" maxlength="100" value="<%= type.description %>" placeholder="Oyuncu, kurulum veya destek talepleri" />
+            </label>
+
+            <label class="panel-field">
+              <span>Emoji</span>
+              <input class="form-control" type="text" name="ticketTypeEmoji" maxlength="8" value="<%= type.emoji %>" placeholder="🎫" />
+            </label>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  </article>
+
+  <div class="panel-form-actions panel-card--span-two">
+    <button class="btn btn-primary" type="submit">Ayarları kaydet</button>
+  </div>
+</form>
+
+<%- include('../partials/footer') %>

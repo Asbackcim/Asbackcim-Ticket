@@ -1,0 +1,30 @@
+<%- include('../partials/header', { title: errorTitle || 'Panel Hatasi' }) %>
+
+<section class="panel-card panel-card--error">
+  <div class="error-code"><%= errorCode %></div>
+  <div class="error-copy">
+    <p class="panel-eyebrow"><%= errorEyebrow %></p>
+    <h2><%= errorTitle %></h2>
+    <p class="panel-subcopy"><%= errorSummary %></p>
+    <p class="panel-rich-copy error-description"><%= errorDescription %></p>
+
+    <% if (errorDetails) { %>
+      <details class="error-details">
+        <summary>Teknik detay</summary>
+        <pre><%= errorDetails %></pre>
+      </details>
+    <% } %>
+
+    <% if (actions?.length) { %>
+      <div class="panel-form-actions error-actions">
+        <% actions.forEach((action) => { %>
+          <a class="<%= action.variant === 'primary' ? 'btn btn-primary' : 'panel-secondary-link' %>" href="<%= action.href %>">
+            <%= action.label %>
+          </a>
+        <% }) %>
+      </div>
+    <% } %>
+  </div>
+</section>
+
+<%- include('../partials/footer') %>

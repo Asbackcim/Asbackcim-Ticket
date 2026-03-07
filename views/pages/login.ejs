@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Panel girisi | <%= BRANDING.panelTitle %></title>
+  <link rel="stylesheet" href="/assets/bootstrap.min.css?v=2" />
+  <link rel="stylesheet" href="/assets/panel.css?v=2" />
+</head>
+<body class="panel-body panel-body--login">
+  <div class="panel-backdrop"></div>
+
+  <main class="login-shell">
+    <% if (message) { %>
+      <div class="panel-notice panel-notice--warning"><%= message %></div>
+    <% } %>
+
+    <section class="login-hero">
+      <div class="login-copy">
+        <p class="panel-eyebrow">GUVENDE. NET. HIZLI.</p>
+        <% if (discordEnabled) { %>
+          <h1>Asback Ticket</h1>
+          <p>
+            Discord uzerinden guvenli giris, ekip bazli yetkilendirme ve canli panel takibi.
+          </p>
+          <div class="login-actions">
+            <a class="btn btn-primary login-cta" href="<%= loginUrl %>">Discord ile giris</a>
+          </div>
+        <% } else if (passwordEnabled) { %>
+          <h1>Panel sifresi ile giris yap.</h1>
+          <p>
+            Discord OAuth2 hazir olmayinca panel sifresiyle gecici giris kullanilir.
+          </p>
+          <form class="login-form login-form--hero" method="post" action="/login/password">
+            <input type="hidden" name="returnTo" value="<%= returnTo %>" />
+            <input type="hidden" name="username" value="<%= passwordUsername %>" />
+
+            <label class="panel-field">
+              <span>Sifre ile hizli giris</span>
+              <div class="login-inline-form">
+                <input
+                  class="form-control"
+                  type="password"
+                  name="password"
+                  autocomplete="current-password"
+                  placeholder="Sifre gir"
+                  required
+                />
+                <button class="btn btn-outline-secondary login-inline-submit" type="submit">Giris yap</button>
+              </div>
+            </label>
+          </form>
+        <% } else { %>
+          <h1>Panel girisi hazir degil.</h1>
+          <p>Discord OAuth2 veya panel sifresi tanimlanmadigi icin giris acilamadi.</p>
+          <div class="panel-empty-state login-empty-state">Giris icin aktif bir dogrulama yontemi bulunamadi.</div>
+        <% } %>
+      </div>
+
+      <aside class="login-status-card">
+        <div class="login-status-head">
+          <span class="status-dot"></span>
+          <strong>Durumlar</strong>
+        </div>
+        <div class="login-status-pills">
+          <span class="status-pill <%= stats.online ? 'tone-success' : 'tone-danger' %>"><%= stats.online ? "Bagli" : "Cevrimdisi" %></span>
+          <span class="status-pill tone-info"><%= stats.guildCount %> sunucu</span>
+          <span class="status-pill tone-warning"><%= stats.openTicketCount %> acik ticket</span>
+          <span class="status-pill tone-muted"><%= stats.logCount %> log</span>
+        </div>
+      </aside>
+    </section>
+  </main>
+</body>
+</html>

@@ -1,0 +1,32 @@
+{
+  "name": "asback-ticket-suite",
+  "version": "1.0.0",
+  "description": "Discord ticket bot with local web panel and transcript archive",
+  "main": "index.js",
+  "scripts": {
+    "start": "node .",
+    "test": "node ."
+  },
+  "keywords": [
+    "discord",
+    "ticket",
+    "web-panel",
+    "asback"
+  ],
+  "author": "Asback custom build (original base by MZR Code)",
+  "license": "MIT",
+  "dependencies": {
+    "ascii-table": "^0.0.9",
+    "croxydb": "^0.0.7",
+    "discord-html-transcripts": "^3.1.4",
+    "discord.js": "^14.11.0",
+    "ejs": "^3.1.10",
+    "express": "^4.21.2",
+    "express-session": "^1.18.1",
+    "glob": "^9.2.1",
+    "moment": "^2.29.4",
+    "path": "^0.12.7",
+    "mzrdjs": "^0.0.27",
+    "mzrdb": "^1.1.0"
+  }
+}

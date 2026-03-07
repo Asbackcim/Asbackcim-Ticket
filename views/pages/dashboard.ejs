@@ -1,0 +1,168 @@
+<%- include('../partials/header', { title: 'Kontrol Merkezi' }) %>
+
+<% if (message) { %>
+  <div class="panel-notice"><%= message %></div>
+<% } %>
+
+<section class="stats-grid">
+  <% if (canViewDeveloperStats) { %>
+    <article class="stat-card">
+      <span class="stat-label">Bot durumu</span>
+      <strong><%= stats.online ? "Cevrimici" : "Cevrimdisi" %></strong>
+      <span class="stat-meta">Gateway ping: <%= stats.ping %> ms</span>
+    </article>
+    <article class="stat-card">
+      <span class="stat-label">Calisma suresi</span>
+      <strong><%= formatDuration(stats.uptimeMs) %></strong>
+      <span class="stat-meta">Kesintisiz operasyon</span>
+    </article>
+  <% } %>
+  <article class="stat-card">
+    <span class="stat-label">Acik ticket</span>
+    <strong><%= stats.openTicketCount %></strong>
+    <span class="stat-meta">Anlik destek kaydi</span>
+  </article>
+  <article class="stat-card">
+    <span class="stat-label">Arsiv log</span>
+    <strong><%= stats.logCount %></strong>
+    <span class="stat-meta">
+      <% if (canViewDeveloperStats && stats.lastHistorySync) { %>
+        Son esitleme: <%= formatDate(stats.lastHistorySync) %>
+      <% } else { %>
+        Arsiv kayit durumu
+      <% } %>
+    </span>
+  </article>
+</section>
+
+<% if (primaryGuild) { %>
+  <section class="panel-card">
+    <div class="panel-card-head">
+      <div>
+        <p class="panel-eyebrow">KURULUM DURUMU</p>
+        <h3><%= primaryGuild.name %> ozeti</h3>
+      </div>
+      <a class="panel-secondary-link" href="/guilds/<%= primaryGuild.id %>">Ayarlari ac</a>
+    </div>
+
+    <p class="panel-subcopy">
+      Panel tek sunucu odakli calisiyor ve aktif olarak <strong><%= primaryGuild.name %></strong> ayarlarini gosteriyor.
+    </p>
+
+    <div class="panel-status-list">
+      <% setupStatus.forEach((item) => { %>
+        <div class="panel-status-row">
+          <div>
+            <strong><%= item.label %></strong>
+            <p><%= item.ready ? 'Bu alan kullanima hazir.' : 'Bu alan henuz tamamlanmadi.' %></p>
+          </div>
+          <span class="status-pill <%= item.ready ? 'tone-success' : 'tone-warning' %>"><%= item.value %></span>
+        </div>
+      <% }) %>
+
+      <div class="panel-status-row">
+        <div>
+          <strong>Arsiv dagilimi</strong>
+          <p>Kapali ve arsivli loglarin son panel durumuna gore ozeti.</p>
+        </div>
+        <div class="panel-status-pills">
+          <span class="status-pill tone-danger"><%= logSummary.closedCount %> kapandi</span>
+          <span class="status-pill tone-success"><%= logSummary.savedCount %> arsivlendi</span>
+        </div>
+      </div>
+    </div>
+  </section>
+<% } else { %>
+  <section class="panel-card">
+    <div class="panel-card-head">
+      <div>
+        <p class="panel-eyebrow">KURULUM BEKLIYOR</p>
+        <h3>Yonetilebilir sunucu bulunmadi</h3>
+      </div>
+    </div>
+    <div class="panel-empty-state">
+      Discord ile giren kullanici icin yonetilebilir ortak sunucu bulunmuyor. Botu sunucuya ekleyip gerekli yonetim yetkilerini kontrol et.
+    </div>
+  </section>
+<% } %>
+
+<section class="panel-grid panel-grid--two">
+  <article class="panel-card">
+    <div class="panel-card-head">
+      <div>
+        <p class="panel-eyebrow">AKTIF KAYITLAR</p>
+        <h3>Acik Ticketlar</h3>
+      </div>
+      <span class="status-pill tone-info"><%= openTickets.length %> kayit</span>
+    </div>
+
+    <% if (openTickets.length > 0) { %>
+      <div class="panel-table-wrap">
+        <table class="panel-data-table">
+          <thead>
+            <tr>
+              <th>Kanal</th>
+              <th>Acan</th>
+              <th>Tip</th>
+              <th>Tarih</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% openTickets.forEach((ticket) => { %>
+              <tr>
+                <td><%= ticket.channelName || "-" %></td>
+                <td><%= ticket.openedByTag || ticket.openedById || "-" %></td>
+                <td><span class="status-pill tone-info"><%= ticket.ticketType?.label || "-" %></span></td>
+                <td><%= formatDate(ticket.createdAt) %></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% } else { %>
+      <div class="panel-empty-state">
+        <p>Acik ticket bulunmuyor.</p>
+        <% if (primaryGuild) { %>
+          <a class="panel-secondary-link section-gap" href="/guilds/<%= primaryGuild.id %>">Sunucu ayarlarini kontrol et</a>
+        <% } %>
+      </div>
+    <% } %>
+  </article>
+
+  <article class="panel-card">
+    <div class="panel-card-head">
+      <div>
+        <p class="panel-eyebrow">ARSIV KAYITLARI</p>
+        <h3>Son Loglar</h3>
+      </div>
+      <a class="panel-secondary-link" href="/logs">Tumunu gor</a>
+    </div>
+
+    <% if (recentLogs.length > 0) { %>
+      <div class="panel-feed">
+        <% recentLogs.forEach((log) => { %>
+          <a class="panel-feed-item" href="/logs/<%= log.id %>">
+            <div>
+              <strong><%= log.channelName || "Ticket kaydi" %></strong>
+              <p><%= log.ticketTypeLabel || "Tip belirtilmedi" %> · <%= formatDate(log.archivedAt) %></p>
+            </div>
+            <span class="status-pill <%= log.action === 'closed' ? 'tone-danger' : 'tone-success' %>">
+              <%= log.action === 'closed' ? 'Kapandi' : 'Arsivlendi' %>
+            </span>
+          </a>
+        <% }) %>
+      </div>
+    <% } else { %>
+      <div class="panel-empty-state">
+        <p>Gosterilecek log bulunmuyor.</p>
+        <% if (canUseAdminActions) { %>
+          <form class="panel-action-form section-gap" method="post" action="/actions/sync-history">
+            <button class="panel-secondary-link" type="submit">Gecmis loglari esitle</button>
+          </form>
+        <% } %>
+      </div>
+    <% } %>
+  </article>
+</section>
+
+<%- include('../partials/footer') %>
